@@ -22,7 +22,9 @@ namespace $.$$ {
 			padding: '1vh',
 			fontSize: '5vmin',
 			border: '1px solid #555',
+			boxSizing: 'content-box',
 			borderRadius: '2px',
+			backgroundColor: 'transparent',
 			boxShadow: 'inset 0 5px 5px rgba(0,0,0,0.15)',
 			outline: 'none',
 		},
@@ -37,7 +39,7 @@ namespace $.$$ {
 
 		/* Контейнер для тегов выбранных параметров */
 		Tags: {
-			padding: '1vh',
+			padding: '1vh 0',
 			marginTop: '1vh',
 		},
 
