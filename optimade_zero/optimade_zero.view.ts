@@ -1,4 +1,15 @@
 namespace $.$$ {
+
+	// Интерфейс конфигурации для каждого элемента
+	interface ItemRendererConfig {
+		// Функция для получения значения поля записи
+		valueGetter: (obj: $optimade_zero_entry) => string;
+		// Фабрика компонента, который отображает поле
+		component: (obj: $optimade_zero_entry) => any;
+		// Значение, которое считается пустым (не отображать компонент)
+		emptyValue?: string;
+	}
+
 	export class $optimade_zero extends $.$optimade_zero {
 
 		@ $mol_mem
@@ -12,37 +23,49 @@ namespace $.$$ {
 					this.Search_input(),
 					this.Search_error(),
 				]
-			} 
+			}
 
+			// Используем вспомогательную функцию для формирования массива компонентов
 			return [
 				this.Search_input(),
-				... this.Search().arity().length > 0 ? [ this.Arity() ] : [],
+				... ( this.Search().arity().length > 0 ? [ this.Arity() ] : [] ),
 				this.Refinements(),
-				... this.Search().results().length === 0 ? [ this.Search_nothing_found() ] : [],
+				... ( this.Search().results().length === 0 ? [ this.Search_nothing_found() ] : [] ),
 				this.Search_results(),
 			]
 		}
 
 		search_results() {
 			if( !this.Search().params_labels().length ) return []
-
 			return this.Search().results().map( obj => this.Item( obj ) )
 		}
 
-		item_row( obj: $optimade_zero_entry ) {
-			return [
-				this.Id( obj ),
-				// obj.thumbs_link() ? this.Thumbs(obj) : null,
-				obj.bib_id() ? this.Bib( obj ) : null,
-				this.Formula( obj ),
-				this.Property( obj ),
-				obj.ref_link() ? this.Ref( obj ) : null,
-				obj.pdf_link() ? this.Pdf( obj ) : null,
-				obj.png_link() ? this.Png( obj ) : null,
-				obj.gif_link() ? this.Gif( obj ) : null,
-			]
+		// Массив конфигураций для рендеринга полей
+		private itemRendererConfigs: ItemRendererConfig[] = [
+			{ valueGetter: o => o.id(), component: o => this.Id(o) },
+			{ valueGetter: o => o.bib_id(), component: o => this.Bib(o), emptyValue: '0' },
+			{ valueGetter: o => o.formula_html(), component: o => this.Formula(o) },
+			{ valueGetter: o => o.property(), component: o => this.Property(o) },
+			{ valueGetter: o => o.ref_link(), component: o => this.Ref(o), emptyValue: '' },
+			{ valueGetter: o => o.pdf_link(), component: o => this.Pdf(o), emptyValue: '' },
+			{ valueGetter: o => o.png_link(), component: o => this.Png(o), emptyValue: '' },
+			{ valueGetter: o => o.gif_link(), component: o => this.Gif(o), emptyValue: '' },
+		];
+
+		// Универсальный метод для рендеринга одного элемента
+		private renderItem(obj: $optimade_zero_entry, config: ItemRendererConfig) {
+			const value = config.valueGetter(obj);
+			// Если значение пустое (или равно заданному emptyValue), возвращаем null
+			if (!value || value === config.emptyValue) return null;
+			return config.component(obj);
+		}
+		// Метод для формирования строки записи на основе конфигураций
+		item_row(obj: $optimade_zero_entry) {
+			return this.itemRendererConfigs.map(cfg => this.renderItem(obj, cfg));
 		}
 
+		// Остальные методы оставляем для совместимости,
+		// хотя большинство делегируют работу методам из $optimade_zero_entry
 		item_id( obj: $optimade_zero_entry ) {
 			return obj.id()
 		}
@@ -88,6 +111,7 @@ namespace $.$$ {
 
 		@$mol_mem
 		refinements() {
+			// Порядок вывода для определённых facet'ов
 			const order: ( keyof $optimade_zero_search_params )[] = [
 				'elements',
 				'formulae',
@@ -95,9 +119,11 @@ namespace $.$$ {
 				'classes',
 				'lattices',
 			]
-			const obj = this.Search().refinements()
+			const refData = this.Search().refinements()
 
-			return order.map( facet => obj[ facet ]?.length ? this.Refinement( facet ) : null ).filter( Boolean )
+			return order
+				.map( facet => refData[ facet ]?.length ? this.Refinement( facet ) : null )
+				.filter( Boolean )
 		}
 
 		refinement_title( facet: keyof $optimade_zero_search_params ) {
@@ -114,23 +140,22 @@ namespace $.$$ {
 
 		@ $mol_mem_key
 		refinement_link_arg( obj: typeof $optimade_zero_search_refinement_item.Value ) {
-			console.log($) 
-			const search = new this.$.$optimade_zero_search()
-			search.params( this.search_params() )
-			search.param_drop(obj.facet)
-			search.param_add(obj.facet, obj.value)
-			return search.params()
+			// Создаём новый объект поиска, основанный на текущих параметрах,
+			// удаляем facet и добавляем новое значение для него
+			const newSearch = new this.$.$optimade_zero_search()
+			newSearch.params( this.search_params() )
+			newSearch.param_drop( obj.facet )
+			newSearch.param_add( obj.facet, obj.value )
+			return newSearch.params()
 		}
 
 		@$mol_mem
 		arity( next?: string ) {
-			if (next !== undefined) {
-				const reset = Object.values(this.Search().arity_names())
-				reset.forEach(val => this.Search().param_drop('classes', val))
-
-				this.Search().param_add('classes', next)
+			if ( next !== undefined ) {
+				const reset = Object.values( this.Search().arity_names() )
+				reset.forEach( val => this.Search().param_drop( 'classes', val ) )
+				this.Search().param_add( 'classes', next )
 			}
-
 			return next ?? ''
 		}
 	}
