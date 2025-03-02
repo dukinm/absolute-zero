@@ -33,7 +33,8 @@ $optimade_zero $mol_book2
 								<= Id* $mol_paragraph
 									title <= item_id* \
 								<= Thumbs* $mol_image
-									uri <= item_thumbs* \
+									uri <= item_png* \
+									title \PNG
 								<= Bib* $mol_view
 									sub /
 										\[

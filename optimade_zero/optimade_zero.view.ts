@@ -43,6 +43,7 @@ namespace $.$$ {
 
 		// Массив конфигураций для рендеринга полей
 		private itemRendererConfigs: ItemRendererConfig[] = [
+			{ valueGetter: o => o.thumbs_link(), component: o => this.Thumbs(o), emptyValue: '' },
 			{ valueGetter: o => o.id(), component: o => this.Id(o) },
 			{ valueGetter: o => o.bib_id(), component: o => this.Bib(o), emptyValue: '0' },
 			{ valueGetter: o => o.formula_html(), component: o => this.Formula(o) },
@@ -108,11 +109,11 @@ namespace $.$$ {
 			return obj.gif_link()
 		}
 
-		arity_dict() {
-			return this.Search().arity().reduce( ( dict, name ) => {
-				dict[ name ] = name
-				return dict
-			}, {} as Record<string, string> )
+		arity_dict(): Record<string, string> {
+			return this.Search().arity().reduce((dict: Record<string, string>, name: string): Record<string, string> => {
+				dict[name] = name;
+				return dict;
+			}, {} as Record<string, string>);
 		}
 
 		@$mol_mem
@@ -137,7 +138,9 @@ namespace $.$$ {
 		}
 
 		refinement_content( facet: keyof $optimade_zero_search_params ) {
-			return this.Search().refinements()[ facet ]!.map( obj => this.Refinement_link( obj ) )
+			return this.Search().refinements()[ facet ]!.map(
+				(obj: typeof $optimade_zero_search_refinement_item.Value) => this.Refinement_link( obj )
+			)
 		}
 
 		refinement_link_title( obj: typeof $optimade_zero_search_refinement_item.Value ) {

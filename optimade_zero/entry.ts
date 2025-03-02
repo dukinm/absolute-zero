@@ -14,10 +14,6 @@ namespace $.$$  {
 
 	export class $optimade_zero_entry extends $mol_store<typeof $optimade_zero_search_entry.Value> {
 
-		cdn_uri() {
-			return 'https://mpds.io';
-		}
-
 		api_uri() {
 			return 'https://api.mpds.io/v0';
 		}
@@ -105,11 +101,7 @@ namespace $.$$  {
 
 		// Отдельная функция для формирования ссылки миниатюры
 		thumbs_link(): string {
-			const t = this.type();
-			if( t === 'P' ) return '';
-			const cdn = this.cdn_uri();
-			const folder = t === 'C' ? 'pd_thumbs' : 'rd_thumbs';
-			return `${ cdn }/${ folder }/${ this.id_prefix() }/.png`;
+			return this.downloadLink( 'png' );
 		}
 	}
 }
