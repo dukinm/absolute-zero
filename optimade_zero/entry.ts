@@ -1,4 +1,4 @@
-namespace $ {
+namespace $.$$  {
 
 	// Определяем маппинг полей записи
 	enum EntryField {
