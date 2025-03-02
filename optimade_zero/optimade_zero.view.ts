@@ -10,6 +10,7 @@ namespace $.$$ {
 		emptyValue?: string;
 	}
 
+
 	export class $optimade_zero extends $.$optimade_zero {
 
 		@ $mol_mem
@@ -75,7 +76,12 @@ namespace $.$$ {
 		}
 
 		item_html( obj: $optimade_zero_entry ) {
-			return `<div>${ obj.formula_html() }</div>`
+			const safe_html=obj.formula_html().replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;')
+				.replace(/'/g, '&#39;');
+			return `<div>${ safe_html }</div>`
 		}
 
 		item_property( obj: $optimade_zero_entry ) {
