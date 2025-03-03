@@ -1,5 +1,50 @@
 namespace $.$$ {
+	/**
+	 * Функция sanitizeHTML безопасно экранирует входной HTML,
+	 * сохраняя только те теги, которые указаны в allowedTags.
+	 *
+	 * @param html Исходная строка HTML.
+	 * @param allowedTags Массив имён тегов, которые разрешено сохранять (например, ['sub', 'sup']).
+	 * @returns Строка HTML, безопасная для вставки в DOM.
+	 */
+	function sanitizeHTML(html: string, allowedTags: string[] = []): string {
+		const allowedSet = new Set(allowedTags.map(tag => tag.toUpperCase()));
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(html, 'text/html');
 
+		function processNode(node: Node): string {
+			if (node.nodeType === Node.TEXT_NODE) {
+				// Экранируем специальные символы
+				return node.textContent
+					?.replace(/&/g, '&amp;')
+					.replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;') || '';
+			}
+			if (node.nodeType === Node.ELEMENT_NODE) {
+				const el = node as Element;
+				let inner = '';
+				el.childNodes.forEach(child => {
+					inner += processNode(child);
+				});
+				// Если тег разрешён, сохраняем его (без атрибутов)
+				if (allowedSet.has(el.tagName)) {
+					const tagName = el.tagName.toLowerCase();
+					return `<${tagName}>${inner}</${tagName}>`;
+				} else {
+					// Иначе возвращаем только содержимое
+					return inner;
+				}
+			}
+			// Игнорируем прочие типы узлов
+			return '';
+		}
+
+		let safeHtml = '';
+		doc.body.childNodes.forEach(node => {
+			safeHtml += processNode(node);
+		});
+		return safeHtml;
+	}
 	// Интерфейс конфигурации для каждого элемента
 	interface ItemRendererConfig {
 		// Функция для получения значения поля записи
@@ -76,12 +121,10 @@ namespace $.$$ {
 			return obj.thumbs_link()
 		}
 
+
 		item_html( obj: $optimade_zero_entry ) {
-			const safe_html=obj.formula_html().replace(/&/g, '&amp;')
-				.replace(/</g, '&lt;')
-				.replace(/>/g, '&gt;')
-				.replace(/"/g, '&quot;')
-				.replace(/'/g, '&#39;');
+			// Используем sanitizeHTML, разрешая теги sub и sup
+			const safe_html = sanitizeHTML(obj.formula_html(), ['sub', 'sup']);
 			return `<div>${ safe_html }</div>`
 		}
 
