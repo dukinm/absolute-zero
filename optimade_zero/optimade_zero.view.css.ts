@@ -34,8 +34,19 @@ namespace $.$$ {
 			padding: '2vh 2vw',
 			background: '#fff',
 		},
+		$optimade_zero_search_results: {
+			display: 'grid',
+			gridGap: '2vh',
+			gridTemplateColumns: '1fr 1fr',
+		},
 
 		/* Стили для ячеек списка результатов */
+
+		$optimade_zero_item: {
+			minHeight: '10vh',
+			display: 'flex',
+			flexDirection: 'column',
+		},
 		Id: {
 			padding: $mol_gap.text,
 			// width: '7rem',
