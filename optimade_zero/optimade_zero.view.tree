@@ -34,7 +34,7 @@ $optimade_zero $mol_book2
 									title <= item_id* \
 								<= Thumbs* $mol_image
 									uri <= item_png* \
-									title \PNG
+									title / <= item_property* \
 								<= Bib* $mol_view
 									sub /
 										\[
