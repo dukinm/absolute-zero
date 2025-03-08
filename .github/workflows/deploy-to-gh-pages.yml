@@ -1,7 +1,6 @@
 name: build demo
 
 on:
-  workflow_dispatch:
   push:
   pull_request:
 
