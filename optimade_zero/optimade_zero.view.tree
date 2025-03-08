@@ -1,0 +1,64 @@
+$optimade_zero $mol_book2
+	Search $optimade_zero_search
+		params? <=> search_params? *
+		error => search_error
+	pages /
+		<= Search_page $mol_page
+			title \−273.15°C
+			foot <= Footer $mol_html_view
+				html <= Footer
+			body <= search_page_body /
+				<= Search_input $optimade_zero_search_input
+					Search <= Search
+				<= Arity $mol_labeler
+					title @ \Arity
+					content /
+						<= Arity_switch $mol_switch
+							value? <=> arity? \
+							options <= arity_dict *
+				<= Refinements $mol_list
+					rows <= refinements /
+						<= Refinement*0 $mol_labeler
+							title <= refinement_title* \
+							content <= refinement_content* /
+								<= Refinement_link*0 $mol_link
+									arg <= refinement_link_arg* *
+									title <= refinement_link_title* \
+				<= Search_error $mol_view
+					sub / <= search_error
+				<= Search_nothing_found $mol_view
+					sub / <= nothing_found @ \Nothing found
+				<= Search_results $mol_list
+					rows <= search_results /
+						<= Item*0 $mol_row
+							sub <= item_row* /
+								<= Id* $mol_paragraph
+									title <= item_id* \
+								<= Thumbs* $mol_image
+									uri <= item_png* \
+									title / <= item_property* \
+								<= Bib* $mol_view
+									sub /
+										\[
+										<= item_bib* \
+										\]
+								<= Formula* $mol_html_view
+									html <= item_html* \
+								<= Property* $mol_view
+									sub / <= item_property* \
+								<= Ref* $mol_link
+									uri <= item_ref* \
+									title \Ref.
+									target \_blank
+								<= Pdf* $mol_link
+									uri <= item_pdf* \
+									title \PDF
+									target \_blank
+								<= Png* $mol_link
+									uri <= item_png* \
+									title \PNG
+									target \_blank
+								<= Gif* $mol_link
+									uri <= item_gif* \
+									title \GIF
+									target \_blank
