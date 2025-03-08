@@ -5,6 +5,8 @@ $optimade_zero $mol_book2
 	pages /
 		<= Search_page $mol_page
 			title \−273.15°C
+			foot <= Footer $mol_html
+				html <= Footer
 			body <= search_page_body /
 				<= Search_input $optimade_zero_search_input
 					Search <= Search

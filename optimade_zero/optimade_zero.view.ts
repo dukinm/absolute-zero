@@ -58,6 +58,94 @@ namespace $.$$ {
 
 	export class $optimade_zero extends $.$optimade_zero {
 
+		// Массивы значений для генерации примеров
+		private randomClasses = ['metal', 'oxide', 'conductor', 'nonmetal'];
+		private randomGroups = ['transitional', 'chalcogen', 'rare earth'];
+		private randomFormulae = ['H2O', 'NaCl', 'CO2'];
+		private randomLattices = ['cubic', 'tetragonal', 'orthorhombic'];
+		private randomProps = ['magnetism', 'electronic properties', 'mechanical properties'];
+		private randomAnonymous = ['ABC', 'AB2', 'ABC3'];
+		private periodicElements = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne'];
+
+		// Вспомогательная функция для выбора случайного элемента массива
+		private getRandomItem(arr: string[]): string {
+			return arr[Math.floor(Math.random() * arr.length)];
+		}
+
+		// Функции для получения случайных значений
+		private getRandomClass(): string { return this.getRandomItem(this.randomClasses); }
+		private getRandomGroup(): string { return this.getRandomItem(this.randomGroups); }
+		private getRandomFormula(): string { return this.getRandomItem(this.randomFormulae); }
+		private getRandomLattice(): string { return this.getRandomItem(this.randomLattices); }
+		private getRandomProp(): string { return this.getRandomItem(this.randomProps); }
+		private getRandomAnonymous(): string { return this.getRandomItem(this.randomAnonymous); }
+		private getRandomElements(count: number): string {
+			let result: string[] = [];
+			while (result.length < count) {
+				const el = this.getRandomItem(this.periodicElements);
+				if (!result.includes(el)) result.push(el);
+			}
+			return result.join('-');
+		}
+
+		// Метод генерации примера, имитирующий старую функцию WMCORE.generate_example()
+		private generateExample(): { text: string, facets: string[], terms: string[] } {
+			const scene = Math.floor(Math.random() * 8) + 1;
+			let result = { text: '', facets: [] as string[], terms: [] as string[] };
+
+			if (scene === 1) { // classes-elements
+				result.facets = ['classes', 'elements'];
+				result.terms = [this.getRandomClass(), this.getRandomElements(2)];
+				result.text = result.terms[0] + ' ' + result.terms[1];
+			} else if (scene === 2) { // classes-classes
+				result.facets = ['classes', 'classes'];
+				result.terms = [this.getRandomGroup(), this.getRandomClass()];
+				result.text = result.terms[0] + ' group, ' + result.terms[1];
+			} else if (scene === 3) { // formulae-lattices
+				result.facets = ['formulae', 'lattices'];
+				result.terms = [this.getRandomFormula(), this.getRandomLattice()];
+				result.text = result.terms[0] + ' ' + result.terms[1] + ' crystal';
+			} else if (scene === 4) { // props-classes
+				result.facets = ['props', 'classes'];
+				result.terms = [this.getRandomProp(), this.getRandomClass()];
+				result.text = result.terms[0] + ' for ' + result.terms[1];
+				if (!result.text.endsWith('d') && !result.text.endsWith('s'))
+					result.text += 's';
+			} else if (scene === 5) { // classes-lattices
+				result.facets = ['classes', 'lattices'];
+				result.terms = [this.getRandomClass(), this.getRandomLattice()];
+				result.text = result.terms[0] + ', ' + result.terms[1] + ' crystal';
+			} else if (scene === 6) { // elements-lattices
+				result.facets = ['elements', 'lattices'];
+				result.terms = [this.getRandomElements(1), this.getRandomLattice()];
+				result.text = result.terms[0] + ', ' + result.terms[1] + ' crystal';
+			} else if (scene === 7) { // props and anonymous formulae
+				result.facets = ['props', 'formulae'];
+				result.terms = [this.getRandomProp(), this.getRandomAnonymous()];
+				result.text = result.terms[0] + ' ' + result.terms[1];
+			} else { // props-formulae
+				result.facets = ['props', 'formulae'];
+				result.terms = [this.getRandomProp(), this.getRandomFormula()];
+				result.text = result.terms[0] + ' of ' + result.terms[1];
+			}
+
+			return result;
+		}
+
+		// Мемоизированное свойство, возвращающее HTML с примером
+		@ $mol_mem
+		example_html(): string {
+			const ex = this.generateExample();
+			// Преобразуем цифры в нижние индексы (аналог replace(/\d/g, "&#x208$&;"))
+			const text = ex.text.replace(/\d/g, match => `<sub>${ match }</sub>`);
+			return `<i>e.g.</i> <a href="#!${ ex.facets[1] }=${ ex.terms[1] }/${ ex.facets[0] }=${ ex.terms[0] }" data-facet-a="${ ex.facets[0] }" data-facet-b="${ ex.facets[1] }" data-term-a="${ ex.terms[0] }" data-term-b="${ ex.terms[1] }">${ text }</a>`;
+		}
+
+		// Метод, который будет использоваться в view для вывода футера
+		Footer() {
+			return [this.example_html()];
+		}
+
 		@ $mol_mem
 		search_params( next?: $optimade_zero_search_params ): $optimade_zero_search_params {
 			return this.$.$mol_state_arg.dict( next ) ?? {}
