@@ -1,14 +1,9 @@
-name: $hyoo_budget_app
-
-# https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs#defining-access-for-the-github_token-permissions
-permissions: write-all
+name: build demo
 
 on:
   workflow_dispatch:
   push:
   pull_request:
-  schedule:
-    - cron: "0 7 * * *"
 
 jobs:
   build:
@@ -19,9 +14,10 @@ jobs:
 
       - uses: hyoo-ru/mam_build@master2
         with:
-          package: 'optimade/zero'
+          package: 'optimade_zero'
+          modules: 'app'
 
-      - uses: hyoo-ru/gh-deploy@v4.4.1
-        if: github.ref == 'refs/heads/main'
+      - uses: JamesIves/github-pages-deploy-action@4.1.7
         with:
-          folder: 'optimade/zero/-'
+          branch: gh-pages
+          folder: 'optimade_zero/-'
