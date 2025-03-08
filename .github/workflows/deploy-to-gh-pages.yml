@@ -14,10 +14,10 @@ jobs:
 
       - uses: hyoo-ru/mam_build@master2
         with:
-          package: 'optimade_zero'
+          package: 'mpds/visavis'
           modules: 'app'
 
       - uses: JamesIves/github-pages-deploy-action@4.1.7
         with:
           branch: gh-pages
-          folder: 'optimade/zero/-'
+          folder: 'mpds/visavis/app/-'
