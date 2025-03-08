@@ -58,6 +58,7 @@ namespace $.$$ {
 
 	export class $optimade_zero extends $.$optimade_zero {
 
+
 		// Массивы значений для генерации примеров
 		private randomClasses = ['metal', 'oxide', 'conductor', 'nonmetal'];
 		private randomGroups = ['transitional', 'chalcogen', 'rare earth'];
@@ -143,9 +144,8 @@ namespace $.$$ {
 
 		// Метод, который будет использоваться в view для вывода футера
 		Footer() {
-			return [this.example_html()];
+			return [this.$.$mol_dom_parse( this.example_html(), 'text/html' ).body];
 		}
-
 		@ $mol_mem
 		search_params( next?: $optimade_zero_search_params ): $optimade_zero_search_params {
 			return this.$.$mol_state_arg.dict( next ) ?? {}
